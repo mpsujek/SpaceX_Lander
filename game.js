@@ -206,7 +206,7 @@ function draw() {
       spaceship.velocity.x = 0;
       spaceship.velocity.y = 0;
       speed = 0;
-      drawMonit('Great Job - Elon Musk it proud of You','Press Space button to Restart');
+      drawMonit('Great Job - Elon Musk is proud of You','Press Space button to Restart');
 
 
     }else if (destroyDetector()){
