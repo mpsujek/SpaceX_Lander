@@ -18,6 +18,7 @@ var spaceship = {
     engineOn: false,
     rotatingLeft: false,
     rotatingRight: false,
+    fuel:1000
 };
 var landingPoint = {
   color:"black",
@@ -42,12 +43,24 @@ var ocean = {
 var startMonit = {
   color:"#666 ",
   width: 500,
-  height: 500,
+  height: 300,
   position:{
     x: 400,
     y: 250
   }
 };
+
+var fuelLevel ={
+  width: 100,
+  height: 100,
+  color:"transparent",
+  position:{
+    x:0,
+    y:0
+  }
+};
+
+var speed = 0.5;
 
 function drawSpaceship() {
     context.save();
@@ -59,7 +72,7 @@ function drawSpaceship() {
     context.fill();
     context.closePath();
 
-    if (spaceship.engineOn) {
+    if (spaceship.engineOn && spaceship.fuel > 0) {
         context.beginPath();
         context.moveTo(spaceship.width * -0.5, spaceship.height * 0.5);
         context.lineTo(spaceship.width * 0.5, spaceship.height * 0.5);
@@ -86,12 +99,8 @@ function updateSpaceship(){
 
     if(spaceship.engineOn)
     {
-        //console.log(spaceship.velocity.x, spaceship.thrust);
         spaceship.velocity.x += spaceship.thrust * Math.sin(-spaceship.angle);
-        //console.log('velocity.x',spaceship.velocity.x, spaceship.thrust);
         spaceship.velocity.y += spaceship.thrust * Math.cos(spaceship.angle);
-        // console.log(spaceship.velocity.y);
-        // * Math.cos(spaceship.angle);
     }
      spaceship.velocity.y -= gravity;
 
@@ -121,7 +130,7 @@ function drawOcean(){
   context.restore();
 }
 
-function dawStartMonit(){
+function drawMonit(text, resetText){
   context.save();
   context.beginPath();
   context.translate(startMonit.position.x, startMonit.position.y);
@@ -130,12 +139,36 @@ function dawStartMonit(){
   context.fill();
   context.closePath();
   context.restore();
+  context.font = "20px Monaco";
+  context.fillStyle= "black";
+  context.fillText(text,180,250);
+  context.closePath();
+  context.beginPath();
+  context.fillText(resetText,180,300);
+  context.closePath();
+  context.restore();
 }
 
+function drawFuelLevel(){
+  context.save();
+  context.beginPath();
+  context.translate(fuelLevel.position.x, fuelLevel.position.y);
+  context.rect(fuelLevel.width * - 0.5, fuelLevel.height * - 0.5, fuelLevel.width, fuelLevel.height);
+  context.fillStyle = fuelLevel.color;
+  context.fill();
+  context.closePath();
+  context.beginPath();
+  context.font = "20px Monaco";
+  context.fillStyle= "black";
+  context.fillText("Fuel level:"+spaceship.fuel,10,50);
+  context.fillText("Steer with arrows", 10, 70);
+  context.closePath();
+  context.restore();
+}
+
+
 function draw() {
-
     context.clearRect(0, 0, canvas.width, canvas.height);
-
     updateSpaceship();
 
     drawSpaceship();
@@ -144,19 +177,52 @@ function draw() {
 
     drawOcean();
 
+    drawFuelLevel();
+
     colisionDetector();
 
     requestAnimationFrame(draw);
 
-    destroyDetector();
+
+    landingPoint.position.x += speed;
+    if (landingPoint.position.x > 780){
+      speed = -0.5;
+    } else if ( landingPoint.position.x < 20){
+      speed = 0.5;
+    }
+
+    if(spaceship.engineOn === true && spaceship.fuel > 0){
+      spaceship.fuel -= 1;
+    }
 
 
-    if (colisionDetector() && spaceship.velocity.y > -1.5){
-      spaceship.velocity.x = 0;
-      spaceship.velocity.y = 0;
+    if (spaceship.fuel === 0){
+      spaceship.thrust = 0;
+      spaceship.fuel = 0;
+      speed = 0;
       }
 
-    dawStartMonit();
+    if (colisionDetector() && spaceship.velocity.y > -1.5 && spaceship.angle < 0.20 && spaceship.angle > -0.20){
+      spaceship.velocity.x = 0;
+      spaceship.velocity.y = 0;
+      speed = 0;
+      drawMonit('Great Job - Elon Musk it proud of You','Press Space button to Restart');
+
+
+    }else if (destroyDetector()){
+      spaceship.velocity.x = 0;
+      spaceship.velocity.y = 0;
+      spaceship.angle += Math.PI / 180;
+      speed = 0;
+
+      drawMonit('Game Over', 'Press Space button to Restart');
+      spaceship.color = 'red';
+      spaceship.width = '30';
+      spaceship.height='30';
+
+    }
+
+
 
 }
 
@@ -171,17 +237,13 @@ function colisionDetector() {
   }
 }
 function destroyDetector(){
-  if(spaceship.position.x < (ocean.position.x + ocean.width) &&
-    spaceship.position.x + spaceship.width >ocean.position.x &&
-    (spaceship.position.y + (spaceship.height))< ocean.position.y + ocean.width &&
-    (spaceship.position.y + (spaceship.height)) + spaceship.width>ocean.position.y ){
-      console.log("destoyed");
+  if(spaceship.position.y > 475){
+      return true;
     }
 }
 
 
 function keyLetGo(event) {
-    // console.log('keyLetGo', spaceship.position);
     switch (event.keyCode) {
         case 37:
             // Left Arrow key
@@ -201,7 +263,6 @@ function keyLetGo(event) {
 document.addEventListener('keyup', keyLetGo);
 
 function keyPressed(event) {
-    // console.log('keyPressed',spaceship.position);
     switch (event.keyCode) {
         case 37:
             // Left Arrow key
@@ -214,6 +275,10 @@ function keyPressed(event) {
         case 38:
             // Up Arrow key
             spaceship.engineOn = true;
+            break;
+        case 32:
+            // space bar
+            location.reload();
             break;
     }
 }
