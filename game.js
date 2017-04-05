@@ -179,7 +179,7 @@ function draw() {
 
     drawFuelLevel();
 
-    colisionDetector();
+    collisionDetector();
 
     requestAnimationFrame(draw);
 
@@ -202,7 +202,7 @@ function draw() {
       speed = 0;
       }
 
-    if (colisionDetector() && spaceship.velocity.y > -1.5 && spaceship.angle < 0.20 && spaceship.angle > -0.20){
+    if (collisionDetector() && spaceship.velocity.y > -1.5 && spaceship.angle < 0.20 && spaceship.angle > -0.20){
       spaceship.velocity.x = 0;
       spaceship.velocity.y = 0;
       speed = 0;
@@ -227,7 +227,7 @@ function draw() {
 }
 
 
-function colisionDetector() {
+function collisionDetector() {
   if(spaceship.position.x < landingPoint.position.x + landingPoint.width &&
     spaceship.position.x + spaceship.width >landingPoint.position.x &&
     (spaceship.position.y + (spaceship.height/2))< landingPoint.position.y + landingPoint.width &&
