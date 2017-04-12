@@ -160,11 +160,15 @@ function drawFuelLevel(){
   context.beginPath();
   context.font = "20px Monaco";
   context.fillStyle= "black";
+  context.fillText("SpaceX Game", 10, 25);
   context.fillText("Fuel level:"+spaceship.fuel,10,50);
-  context.fillText("Steer with arrows", 10, 70);
+  context.fillText("Steer with arrows", 10, 75);
+  context.fillText("Land on platform", 10, 100);
   context.closePath();
   context.restore();
 }
+
+
 
 
 function draw() {
